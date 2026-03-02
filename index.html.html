@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Saber 11° - Sociales y Ciudadanas</title>
+    <style>
+        /* Todos tus estilos se mantienen igual */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .test-container {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,20,40,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 4px solid #d32f2f;
+            flex-wrap: wrap;
+        }
+        .logo-left, .logo-right {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-left { justify-content: flex-start; }
+        .logo-right { justify-content: flex-end; }
+        .logo-item img {
+            max-height: 65px;
+            width: auto;
+            object-fit: contain;
+        }
+        .header-center h1 {
+            font-size: 1.4rem;
+            color: #1a2b4c;
+            font-weight: 600;
+            border-bottom: 2px solid #ffb300;
+            padding-bottom: 5px;
+        }
+        .content {
+            padding: 30px 40px;
+        }
+        .student-info {
+            background: linear-gradient(135deg, #e8f0fe, #ffffff);
+            border-radius: 28px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 2px solid #1a2b4c;
+            box-shadow: 0 8px 0 #0f1a2c;
+        }
+        .student-info h3 {
+            color: #1a2b4c;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #ffb300;
+            padding-bottom: 10px;
+        }
+        .info-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .info-field {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-field label {
+            font-weight: 600;
+            color: #1a2b4c;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        .info-field input {
+            padding: 12px 15px;
+            border: 2px solid #dce5f0;
+            border-radius: 18px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: white;
+        }
+        .info-field input:focus {
+            border-color: #d32f2f;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+        }
+        .info-field input::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+        .btn-guardar-info {
+            background: #1a2b4c;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 20px;
+            box-shadow: 0 4px 0 #0f1a2c;
+            transition: all 0.1s ease;
+            width: auto;
+            display: inline-block;
+        }
+        .btn-guardar-info:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #0f1a2c;
+        }
+        .welcome-panel {
+            background: #e8f0fe;
+            border-radius: 28px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid #bbdefb;
+            text-align: center;
+        }
+        .btn-start, .btn-restart {
+            background: #1a2b4c;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 20px;
+            box-shadow: 0 8px 0 #0f1a2c;
+            transition: all 0.1s ease;
+        }
+        .btn-start:active, .btn-restart:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #0f1a2c;
+        }
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 8px 0 #0f1a2c;
+        }
+        .question {
+            background: white;
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 10px solid #d32f2f;
+        }
+        .context-box {
+            background: #f9fbfd;
+            padding: 20px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            border: 1px dashed #1a2b4c;
+        }
+        .relato-principal {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #1a2b4c;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e7f0;
+        }
+        .fuente-contexto {
+            background: #e8f0fe;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #2c3e50;
+            border-left: 6px solid #1a2b4c;
+            margin-top: 10px;
+        }
+        .fuente-contexto i {
+            color: #666;
+            font-style: italic;
+        }
+        .fuente-contexto::before {
+            content: "📌 ";
+            font-weight: bold;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95rem;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .data-table th {
+            background: #1a2b4c;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .data-table td {
+            border: 1px solid #dce5f0;
+            padding: 10px 8px;
+            text-align: center;
+        }
+        .data-table tr:nth-child(even) {
+            background: #f5f7fa;
+        }
+        .fuentes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .fuente-card {
+            background: white;
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 6px solid;
+            transition: transform 0.2s;
+        }
+        .fuente-card:hover {
+            transform: translateY(-3px);
+        }
+        .fuente-card:nth-child(1) { border-left-color: #d32f2f; }
+        .fuente-card:nth-child(2) { border-left-color: #1976d2; }
+        .fuente-card:nth-child(3) { border-left-color: #2e7d32; }
+        .fuente-card:nth-child(4) { border-left-color: #ffb300; }
+        .fuente-titulo {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #1a2b4c;
+        }
+        .fuente-contenido {
+            color: #2c3e50;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .fuente-contenido::before {
+            content: "“";
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+        .fuente-contenido::after {
+            content: "”";
+            font-size: 1.2rem;
+            opacity: 0.6;
+        }
+        .options label {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 20px;
+            margin: 10px 0;
+            background: #f9fbfd;
+            border-radius: 18px;
+            border: 1px solid #dce5f0;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .options label:hover {
+            background: #e9f0fa;
+            border-color: #1a2b4c;
+        }
+        input[type="radio"] {
+            margin-right: 15px;
+            margin-top: 3px;
+            accent-color: #d32f2f;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+        .btn-nav {
+            background: #1a2b4c;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 4px 0 #0f1a2c;
+            transition: 0.1s;
+        }
+        .btn-nav:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #0f1a2c;
+        }
+        .btn-nav:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 0 #0f1a2c;
+        }
+        .btn-submit {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 16px 40px;
+            font-size: 1.3rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 700;
+            width: 100%;
+            margin: 20px 0;
+            box-shadow: 0 8px 0 #8b1e1e;
+        }
+        .btn-submit:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #8b1e1e;
+        }
+        .results-panel {
+            background: linear-gradient(135deg, #13294b, #1f3a6b);
+            color: white;
+            border-radius: 30px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin: 20px 0;
+        }
+        .result-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .result-card h3 {
+            color: #ffb74d;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            padding-bottom: 8px;
+        }
+        .score-big {
+            font-size: 4rem;
+            font-weight: 800;
+            text-align: center;
+            color: #ffb300;
+            line-height: 1;
+        }
+        .feedback-detalle {
+            background: white;
+            color: #1a2b4c;
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .justificacion {
+            background: #e3f2fd;
+            border-left: 8px solid #1976d2;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+        }
+        .pregunta-resumen {
+            background: #f5f7fa;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 6px solid #d32f2f;
+        }
+        .taxonomy-mini {
+            background: #1a2b4c;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+        }
+        .competencias-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .competencias-table th {
+            background: #1a2b4c;
+            color: white;
+            padding: 15px 10px;
+            font-size: 1rem;
+        }
+        .competencias-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e0e7f0;
+            text-align: center;
+        }
+        .competencias-table tr:last-child td {
+            border-bottom: none;
+        }
+        .competencias-table tr:nth-child(even) {
+            background: #f8fafd;
+        }
+        .badge-excelente {
+            background: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-bien {
+            background: #2196f3;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-regular {
+            background: #ff9800;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .badge-mejorar {
+            background: #f44336;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .save-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+        .save-notification.error {
+            background: #f44336;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @media (max-width:700px) {
+            .header { flex-direction: column; text-align: center; }
+            .logo-left, .logo-right { justify-content: center; }
+            .results-grid { grid-template-columns: 1fr; }
+            .fuentes-grid { grid-template-columns: 1fr; }
+            .info-fields { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="test-container" id="app">
+
+    <!-- HEADER CON LOGOS -->
+    <div class="header">
+        <div class="logo-left">
+            <div class="logo-item">
+                <img src="https://i.ibb.co/vvsXR4Nj/Monter-a-Bilingual-School-01-1-1.png" alt="Colegio La Salle Montería">
+            </div>
+            <div class="logo-item">
+                <img src="https://i.ibb.co/0PxCBWg/Logo-Catedra-de-La-Paz-SM-1.png" alt="Cátedra de la Paz">
+            </div>
+        </div>
+        <div class="header-center">
+            <h1>SABER 11°<br>SOCIALES Y CIUDADANAS</h1>
+        </div>
+        <div class="logo-right">
+            <div class="logo-item">
+                <img src="URL_DEL_LOGO_ICFES_ACTUALIZADO" alt="ICFES">
+            </div>
+        </div>
+    </div>
+
+    <div class="content" id="mainContent"></div>
+    <div id="notificationArea"></div>
+</div>
+
+<script>
+    (function() {
+        // ------------------------------------------------------------
+        // BASE DE DATOS DE PREGUNTAS
+        // ------------------------------------------------------------
+        const questions = [
+            {
+                id: 1,
+                taxonomy: {
+                    competence: "Interpretación y análisis de perspectivas",
+                    affirmation: "Comprende perspectivas de distintos actores y grupos sociales",
+                    evidence: "2.2 Reconoce que las cosmovisiones, ideologías y roles sociales influyen en diferentes argumentos, posiciones y conductas",
+                    basicNotions: "Democracia, participación ciudadana, voto libre y secreto, deber cívico, garantías electorales, rol de actores sociales"
+                },
+                context: `En el municipio de San Jerónimo, dos semanas antes de las elecciones locales, coinciden estos hechos:
+
+I. En reuniones barriales, funcionarios presentan videos con logo institucional y el lema “Cumplir con el municipio es votar”; afirman que “no votar frena proyectos” y no precisan que el voto es libre ni que no hay sanción por abstenerse.
+
+II. Equipos de campaña de varios partidos ofrecen bonos y dinero en barrios con alto desempleo; piden foto del tarjetón y ofrecen transporte solo a quienes acepten el intercambio.
+
+III. Líderes comunitarios impulsan una jornada de pedagogía cívica (escuelas, parques, emisoras) con tres mensajes: el voto es un derecho (libre, igual, secreto), la participación es un deber cívico (ético, no coactivo) y la compra de votos deteriora la representación.
+
+IV. Varias organizaciones proponen medidas operativas para el día electoral: rutas de transporte abiertas a toda la ciudadanía sin condicionamientos, veedurías para monitorear puntos críticos y canales de denuncia para reportar presión o compra de voto.`,
+                question: "Considerando las garantías del sufragio y el sentido cívico del deber de participación en un contexto de vulnerabilidad, ¿cuál valoración es más consistente con los principios democráticos y con acciones compatibles con esas garantías?",
+                options: [
+                    "A. Las prácticas de I y II son incompatibles con el voto libre y secreto; III y IV son coherentes porque combinan pedagogía no coactiva y apoyos universales no condicionados, lo que protege la decisión del elector sin favorecer campañas.",
+                    "B. Las prácticas de I y II son aceptables como estímulos al deber; III y IV son redundantes porque la voluntariedad del intercambio preserva la libertad del elector y los apoyos logísticos pueden focalizarse en quienes ya eligieron candidato.",
+                    "C. Las prácticas de I y III equilibran derecho y deber; II y IV son tolerables si se garantiza secreto con cabinas y si el transporte prioriza a votantes con compromiso manifiesto, para optimizar recursos en zonas críticas.",
+                    "D. Las prácticas de II y IV fortalecen la participación; I y III son neutras porque la difusión institucional acompaña decisiones y la pedagogía no incide en la reducción de compra de votos en contextos de pobreza."
+                ],
+                correct: 0,
+                justification: `La opción A es correcta porque realiza una valoración ajustada a los principios democráticos y a las garantías del sufragio (voto libre, secreto y autónomo):
+
+- I y II son incompatibles: I constituye propaganda institucional coercitiva que vulnera la neutralidad del Estado y presiona al elector. II describe compra de votos (delito electoral) que atenta contra la autonomía del sufragio.
+- III y IV son coherentes: III promueve pedagogía no coactiva que fortalece la autonomía ciudadana. IV propone medidas de apoyo universal y veeduría que protegen a todos los votantes sin condicionamientos.
+
+El estudiante que selecciona esta opción demuestra que reconoce cómo los roles sociales (funcionarios que presionan, partidos que cooptan, líderes que educan, organizaciones que vigilan) influyen en la compatibilidad o incompatibilidad de sus conductas con los principios democráticos.`,
+                distractors: [
+                    "B. Normaliza la compra de votos. Afirmar que el intercambio de dinero por voto es 'aceptable como estímulo' desconoce que, en contextos de vulnerabilidad, la 'voluntariedad' es ficticia y que la compra de votos es un delito que atenta contra la autonomía del elector.",
+                    "C. Tolera lo intolerable. Sostener que la compra de votos (II) es 'tolerable' si se garantiza el secreto en cabinas es un error grave, pues la compra de votos es ilegal independientemente de las condiciones logísticas.",
+                    "D. Desconoce el valor de la pedagogía. Afirmar que la pedagogía cívica (III) 'no incide en la reducción de compra de votos' contradice el fundamento de la formación ciudadana como pilar para el fortalecimiento democrático a largo plazo."
+                ]
+            },
+            {
+                id: 2,
+                taxonomy: {
+                    competence: "Pensamiento Social",
+                    affirmation: "Comprende que los problemas y sus soluciones involucran distintas dimensiones y reconoce relaciones entre estas",
+                    evidence: "1.4 Conoce los mecanismos que los ciudadanos tienen a su disposición para participar activamente en la democracia y para garantizar el respeto de sus derechos",
+                    basicNotions: "Plebiscito, mecanismos de participación democrática, diferencias entre plebiscito y referendo, características legales del plebiscito, Constitución Política de Colombia (Artículo 103), Ley 134 de 1994"
+                },
+                context: `La Constitución Política de Colombia establece en su Artículo 103 que "son mecanismos de participación del pueblo en ejercicio de su soberanía: el voto, el plebiscito, el referendo, la consulta popular, el cabildo abierto, la iniciativa legislativa y la revocatoria del mandato".
+
+Un estudiante está preparando una exposición sobre el plebiscito y escribe cuatro afirmaciones en su cuaderno:
+
+1. "El plebiscito es un mecanismo que puede ser convocado tanto por el Presidente como por los ciudadanos mediante la recolección de firmas".
+2. "El plebiscito permite que los ciudadanos se pronuncien sobre una decisión fundamental tomada por el Presidente".
+3. "El plebiscito puede utilizarse para aprobar una reforma constitucional propuesta por el Congreso".
+4. "La decisión de los ciudadanos en un plebiscito es obligatoria para el Presidente".`,
+                question: "De acuerdo con lo establecido, ¿cuál de las siguientes opciones presenta las afirmaciones CORRECTAS?",
+                options: [
+                    "A. 1 y 3",
+                    "B. 2 y 4",
+                    "C. 2 y 3",
+                    "D. 1 y 4"
+                ],
+                correct: 1,
+                justification: `La opción B (2 y 4) es la correcta:
+
+- Afirmación 1: INCORRECTA. Según la Ley 134 de 1994, el plebiscito es de exclusiva convocatoria del Presidente. Los ciudadanos no pueden convocarlo.
+- Afirmación 2: CORRECTA. Es la esencia del plebiscito: el pueblo apoya o rechaza una decisión del Ejecutivo.
+- Afirmación 3: INCORRECTA. La aprobación de reformas constitucionales corresponde al referendo constitucional, no al plebiscito.
+- Afirmación 4: CORRECTA. La Ley 134 establece que el pronunciamiento del pueblo en un plebiscito es de carácter obligatorio para el Presidente.`,
+                distractors: [
+                    "A. 1 y 3: Ambas afirmaciones son falsas. Confunde el plebiscito con otros mecanismos: la iniciativa ciudadana no aplica para convocar plebiscito (error en 1) y confunde plebiscito con referendo constitucional (error en 3).",
+                    "B. 2 y 4: CORRECTA",
+                    "C. 2 y 3: Mezcla una afirmación correcta (2) con una incorrecta (3). Sabe algo de plebiscito pero no logra diferenciarlo claramente del referendo.",
+                    "D. 1 y 4: Mezcla una afirmación correcta (4) con una incorrecta (1). Desconoce quién puede convocar el plebiscito."
+                ]
+            },
+            {
+                id: 3,
+                taxonomy: {
+                    competence: "Interpretación y análisis de perspectivas",
+                    affirmation: "Comprende perspectivas de distintos actores y grupos sociales",
+                    evidence: "2.3 Establece relaciones entre las perspectivas de los individuos en una situación conflictiva y las propuestas de solución",
+                    basicNotions: "Consulta popular, mecanismos de participación ciudadana, actores sociales, conflicto de intereses, brechas educativas"
+                },
+                context: `En el departamento de Monteverde existen profundas brechas educativas entre la zona urbana y la rural. La gobernadora propone convocar una consulta popular para que los ciudadanos decidan si el departamento debe destinar el 30% del presupuesto de regalías durante cinco años a la educación rural.
+
+Ante esta propuesta surgen las siguientes posturas:
+
+I. Gobernadora: "La ciudadanía debe decidir si priorizamos la educación rural. Si el pueblo lo aprueba, tendremos mandato para actuar".
+II. Consejo de Planeación: "La consulta es legítima, pero las decisiones presupuestales requieren estudios de sostenibilidad fiscal".
+III. Asociación de Empresarios: "Las regalías deben destinarse a proyectos productivos, no a escuelas rurales. Eso le corresponde al gobierno nacional".
+IV. Juntas de Acción Comunal rurales: "Nuestros niños merecen estudiar con dignidad. Es la única manera de romper el círculo de pobreza".`,
+                question: "De acuerdo con las posturas anteriores, ¿cuál de las siguientes opciones establece una relación correcta entre la perspectiva de cada actor y la consulta popular como propuesta de solución?",
+                options: [
+                    "A. La gobernadora y las JAC respaldan la consulta; el Consejo la condiciona a viabilidad fiscal; los empresarios la rechazan porque prefieren inversión productiva.",
+                    "B. La gobernadora y el Consejo apoyan la consulta; los empresarios y las JAC la rechazan por razones económicas y sociales respectivamente.",
+                    "C. La gobernadora y los empresarios promueven la consulta; el Consejo y las JAC se oponen por falta de recursos y por desconfianza en el Estado.",
+                    "D. La gobernadora y el Consejo condicionan la consulta al debate técnico; los empresarios y las JAC la respaldan sin condiciones."
+                ],
+                correct: 0,
+                justification: `La opción A es correcta porque establece adecuadamente las relaciones:
+
+- Gobernadora y JAC rurales: RESPALDAN la consulta (quieren que el pueblo decida).
+- Consejo de Planeación: CONDICIONA la consulta (reconoce legitimidad pero exige estudios fiscales).
+- Empresarios: RECHAZAN la consulta (prefieren inversión productiva).
+
+Esta opción reconoce que frente a una misma solución (consulta popular) los actores pueden tener posturas diferenciadas: respaldo, condición o rechazo.`,
+                distractors: [
+                    "B. Agrupa incorrectamente: El Consejo no 'apoya' la consulta sin condiciones; advierte sobre sostenibilidad. Los empresarios no la rechazan por 'razones sociales' sino económicas; las JAC no la rechazan, la respaldan.",
+                    "C. Invierte las posturas: Los empresarios no promueven la consulta; la rechazan. Las JAC no se oponen; la respaldan.",
+                    "D. Invierte y confunde: La gobernadora no condiciona la consulta; la promueve. Los empresarios no la respaldan; la rechazan."
+                ]
+            },
+            {
+                id: 4,
+                taxonomy: {
+                    competence: "Pensamiento reflexivo y sistémico",
+                    affirmation: "Evalúa usos sociales de las ciencias sociales",
+                    evidence: "5.1 Analiza modelos conceptuales y sus usos en decisiones sociales",
+                    basicNotions: "Dignidad humana, derechos humanos, derechos fundamentales, libertad de creencias, libertad religiosa"
+                },
+                context: `Durante un partido de la Bundesliga (Alemania) en abril de 2022, ocurrió un hecho sin precedentes que conmovió al mundo del fútbol.`,
+                question: "La decisión del árbitro de detener el partido para que el futbolista pudiera romper su ayuno puede entenderse como una aplicación del concepto de",
+                options: [
+                    "A. Derechos humanos.",
+                    "B. Dignidad humana.",
+                    "C. Libertad de creencias.",
+                    "D. Derechos fundamentales."
+                ],
+                correct: 1,
+                justification: `La opción B (Dignidad humana) es la correcta porque:
+
+La dignidad humana es el concepto fundante del cual se derivan todos los demás derechos. En la jurisprudencia colombiana, la dignidad tiene tres dimensiones: 
+(i) autonomía para diseñar un plan vital, 
+(ii) condiciones materiales de existencia, y 
+(iii) integridad física y moral.
+
+La decisión del árbitro protege la autonomía del futbolista para vivir según sus creencias religiosas y garantiza sus condiciones materiales (hidratación, alimentación) en un contexto de exigencia física. No se limita a reconocer un derecho específico, sino que respeta la dignidad de la persona como sujeto autónomo.
+
+Jerarquía conceptual:
+         DIGNIDAD HUMANA (fundamento)
+                  ↓
+     DERECHOS HUMANOS (declaraciones universales)
+                  ↓
+   DERECHOS FUNDAMENTALES (Constitución)
+                  ↓
+   DERECHOS ESPECÍFICOS (libertad de creencias)`,
+                distractors: [
+                    "A. Derechos humanos: Son un conjunto de normas y principios de carácter universal, pero la pregunta pide el concepto que fundamenta la acción. Los derechos humanos son la expresión, no el fundamento último. Se confunde el contenedor con el fundamento.",
+                    "B. Dignidad humana: CORRECTA",
+                    "C. Libertad de creencias: Es un derecho específico (Artículo 19 Constitución), pero la pregunta indaga por el concepto más amplio y fundante del cual se desprende ese derecho. La libertad de creencias es una concreción de la dignidad, no el concepto base.",
+                    "D. Derechos fundamentales: Son derechos positivizados en la Constitución, con mecanismos de protección como la tutela. Son la expresión jurídica, no el fundamento filosófico."
+                ]
+            },
+            {
+                id: 5,
+                taxonomy: {
+                    competence: "Pensamiento social",
+                    affirmation: "Comprende dimensiones espaciales y temporales de eventos, problemáticas y prácticas sociales",
+                    evidence: "2.3 Relaciona problemáticas o prácticas sociales con características del espacio geográfico",
+                    basicNotions: "Participación ciudadana, abstención electoral, geografía electoral, centro-periferia, territorios urbanos y rurales, comportamiento electoral"
+                },
+                context: `Un estudio de la Registraduría Nacional sobre la participación electoral en Colombia entre 2014 y 2023 reveló los siguientes patrones:`,
+                question: "De acuerdo con la información anterior, ¿cuál de las siguientes afirmaciones relaciona correctamente el comportamiento electoral con características del espacio geográfico en Colombia?",
+                options: [
+                    "A. En las elecciones presidenciales, la participación es mayor en territorios periféricos como Vaupés y Guainía debido a su cercanía con las fronteras nacionales.",
+                    "B. En las elecciones locales, la participación es mayor en departamentos como Casanare, Sucre y Córdoba, mientras que en grandes centros urbanos como Bogotá y Valle es menor.",
+                    "C. En las elecciones legislativas, los departamentos con mayor participación son aquellos con alta densidad poblacional como Antioquia y Valle del Cauca.",
+                    "D. En las elecciones presidenciales, la abstención es más alta en Bogotá y Cundinamarca por tratarse de territorios con alta oferta institucional."
+                ],
+                correct: 1,
+                justification: `La opción B es correcta porque establece adecuadamente la relación entre espacio geográfico y comportamiento electoral:
+
+- Los datos muestran que en elecciones locales, la participación es MAYOR en departamentos periféricos/rurales como Casanare, Sucre y Córdoba (>70%).
+- En contraste, es MENOR en grandes centros urbanos como Bogotá y Valle del Cauca (~53%).
+
+El estudio del CEDAE explica este patrón: en zonas rurales y periféricas los ciudadanos perciben mayor cercanía con los candidatos y cargos locales, mientras que en zonas urbanas la participación se concentra en elecciones nacionales.`,
+                distractors: [
+                    "A. Relación inversa: Los datos muestran que Vaupés y Guainía tienen BAJA participación en presidenciales (<33%), no alta. La cercanía con fronteras no explica el fenómeno.",
+                    "B. CORRECTA",
+                    "C. Relación inversa: Antioquia y Valle del Cauca tienen BAJA participación en legislativas (<40%), no alta. Los que más votan son Sucre, Córdoba y periferia.",
+                    "D. Relación inversa: Bogotá y Cundinamarca tienen ALTA participación en presidenciales (~60%), no abstención alta. La oferta institucional no reduce la participación según el estudio."
+                ]
+            },
+            {
+                id: 6,
+                taxonomy: {
+                    competence: "Pensamiento social",
+                    affirmation: "Comprende modelos conceptuales, sus características y contextos de aplicación",
+                    evidence: "1.1 Identifica y usa conceptos sociales básicos (económicos, políticos, culturales y geográficos)",
+                    basicNotions: "Polarización política, conflicto, división social, opinión pública, mecanismos de participación, plebiscito, abandono estatal, violencia política"
+                },
+                context: `El 2 de octubre de 2016, Colombia vivió una jornada histórica. Los ciudadanos fueron convocados a las urnas para votar un plebiscito mediante el cual aprobarían o rechazarían el Acuerdo de Paz firmado entre el Gobierno de Juan Manuel Santos y la guerrilla de las FARC-EP, después de más de cuatro años de negociaciones en La Habana.
+
+Los resultados electorales mostraron una diferencia muy estrecha: el 50,21% de los votantes (6.431.376 personas) votó por el No, mientras que el 49,78% (6.377.482 personas) votó por el Sí. La diferencia fue de apenas 53.894 votos.
+
+Un fenómeno particular llamó la atención de analistas políticos: en las regiones más golpeadas por el conflicto armado —como Bojayá (Chocó), Toribío (Cauca), San Vicente del Caguán (Caquetá) y los municipios del Catatumbo— el Sí obtuvo una victoria arrolladora, superando en algunos casos el 90% de la votación. En contraste, en grandes centros urbanos del interior del país y en regiones donde el conflicto no había tenido un impacto tan directo, el No se impuso con claridad.`,
+                question: "De acuerdo con la información anterior, el fenómeno social que mejor permite explicar la diferencia en los resultados del plebiscito entre las regiones más afectadas por el conflicto y el resto del país es la",
+                options: [
+                    "A. Polarización política.",
+                    "B. Abandono estatal.",
+                    "C. Violencia política.",
+                    "D. Abstención electoral."
+                ],
+                correct: 0,
+                justification: `La opción A (Polarización política) es la correcta porque:
+
+La polarización política es el fenómeno por el cual la opinión pública se divide en dos extremos opuestos frente a un tema fundamental. En este caso, la sociedad colombiana se fracturó entre quienes respaldaban el acuerdo (Sí) y quienes lo rechazaban (No).
+
+La división territorial evidenciada en los resultados (regiones afectadas por el conflicto votaron masivamente Sí, mientras que el resto del país votó No) es una manifestación geográfica de la polarización. Como señalan los análisis, "el plebiscito develó la enorme polarización que existe en Colombia".
+
+La polarización explica tanto la diferencia entre regiones como la estrechez del resultado nacional. La sociedad estaba dividida en dos bloques con posturas irreconciliables frente a la paz.`,
+                distractors: [
+                    "A. Polarización política: CORRECTA",
+                    "B. Abandono estatal: Si bien las regiones más afectadas por el conflicto históricamente han sufrido abandono estatal, este concepto no explica la diferencia en los resultados electorales. El abandono estatal es una causa estructural del conflicto, pero el fenómeno que explica la votación diferenciada es la polarización frente al acuerdo.",
+                    "C. Violencia política: Aunque el contexto del plebiscito está relacionado con el conflicto armado, la violencia política no fue el factor determinante en los resultados. La votación se dio en el marco de un proceso democrático, sin coacción generalizada que explicara el patrón territorial.",
+                    "D. Abstención electoral: Si bien la abstención fue alta (62%), este concepto se refiere a la no participación, no a la división de posturas entre quienes sí votaron. La pregunta busca explicar la diferencia de resultados entre regiones, no la falta de participación."
+                ]
+            },
+            {
+                id: 7,
+                taxonomy: {
+                    competence: "Pensamiento social",
+                    affirmation: "Comprende que los problemas y sus soluciones involucran distintas dimensiones y reconoce relaciones entre estas",
+                    evidence: "3.2 Evalúa posibilidades y limitaciones del uso de una fuente para apoyar argumentos o explicaciones",
+                    basicNotions: "Revocatoria del mandato, mecanismos de participación ciudadana, umbral electoral, control político"
+                },
+                context: `Entre 1991 y 2018 se impulsaron 177 revocatorias del mandato en Colombia. Solo una logró revocar al mandatario.`,
+                question: "Para explicar la baja efectividad de la revocatoria, ¿cuál opción evalúa correctamente estas fuentes?",
+                options: [
+                    "A. La fuente 1 sirve para requisitos; la fuente 2 para motivaciones; la fuente 3 para conceptos; la fuente 4 para trámites.",
+                    "B. La fuente 3 sirve para conceptos; la fuente 1 para requisitos; la fuente 2 para motivaciones; la fuente 4 para trámites.",
+                    "C. La fuente 2 sirve para motivaciones; la fuente 4 para trámites; la fuente 1 para requisitos; la fuente 3 para conceptos.",
+                    "D. La fuente 4 sirve para trámites; la fuente 3 para conceptos; la fuente 2 para motivaciones; la fuente 1 para requisitos."
+                ],
+                correct: 0,
+                justification: `La opción A es la correcta porque establece la correspondencia adecuada entre cada fuente y su aporte:
+
+- **Fuente 1 (Registraduría)**: Aporta información sobre REQUISITOS LEGALES (umbral del 40% de votación).
+- **Fuente 2 (Análisis académico)**: Explica las MOTIVACIONES POLÍTICAS (uso por opositores que perdieron).
+- **Fuente 3 (Artículo de opinión)**: Señala PROBLEMAS CONCEPTUALES (la "insatisfacción general" como causal).
+- **Fuente 4 (Informe periodístico)**: Describe BARRERAS DE TRÁMITE (duración de hasta 15 meses).
+
+Todas las opciones tienen las mismas palabras pero en diferente orden. Solo la opción A presenta el orden correcto: requisitos - motivaciones - conceptos - trámites.`,
+                distractors: [
+                    "A. CORRECTA",
+                    "B. Desordena la correspondencia (asigna conceptos a fuentes equivocadas).",
+                    "C. Desordena la correspondencia.",
+                    "D. Desordena la correspondencia."
+                ]
+            }
+        ];
+
+        // Estado de la app
+        let state = {
+            started: false,
+            currentQuestionIndex: 0,
+            userAnswers: [null, null, null, null, null, null, null],
+            submitted: false,
+            studentName: '',
+            studentCourse: ''
+        };
+
+        const contentDiv = document.getElementById('mainContent');
+        const notificationArea = document.getElementById('notificationArea');
+
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.className = `save-notification ${isError ? 'error' : ''}`;
+            notification.textContent = message;
+            notificationArea.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        function render() {
+            if (!state.started) renderWelcome();
+            else if (!state.submitted) renderTest();
+            else renderResults();
+        }
+
+        function renderWelcome() {
+            contentDiv.innerHTML = `
+                <div class="student-info">
+                    <h3>📋 Información del estudiante</h3>
+                    <div class="info-fields">
+                        <div class="info-field">
+                            <label for="studentName">Nombre completo:</label>
+                            <input type="text" id="studentName" placeholder="Ej: Juan Pérez González" value="${state.studentName}">
+                        </div>
+                        <div class="info-field">
+                            <label for="studentCourse">Curso:</label>
+                            <input type="text" id="studentCourse" placeholder="Ej: 11° A" value="${state.studentCourse}">
+                        </div>
+                    </div>
+                    <button class="btn-guardar-info" id="saveInfoBtn">Guardar información</button>
+                </div>
+                <div class="welcome-panel">
+                    <h2>📘 Prueba Saber 11° - Sociales y Ciudadanas</h2>
+                    <p style="font-size:1.1rem; margin:15px 0;">Evaluación formativa con 7 ítems de opción múltiple.</p>
+                    <p><strong>Instrucciones:</strong> Responde las siete preguntas. Puedes navegar entre ellas. Al finalizar, recibirás un informe consolidado con retroalimentación detallada, la taxonomía de cada pregunta y un análisis por competencias.</p>
+                    <button class="btn-start" id="startBtn" ${!state.studentName || !state.studentCourse ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>Comenzar prueba</button>
+                    <p style="margin-top:10px; color:#666; font-size:0.9rem;">*Debes guardar tu información antes de comenzar</p>
+                </div>
+            `;
+
+            document.getElementById('saveInfoBtn')?.addEventListener('click', () => {
+                const nameInput = document.getElementById('studentName');
+                const courseInput = document.getElementById('studentCourse');
+                if (nameInput.value.trim() && courseInput.value.trim()) {
+                    state.studentName = nameInput.value.trim();
+                    state.studentCourse = courseInput.value.trim();
+                    renderWelcome();
+                } else {
+                    alert('Por favor completa todos los campos.');
+                }
+            });
+
+            document.getElementById('startBtn')?.addEventListener('click', () => {
+                if (state.studentName && state.studentCourse) {
+                    state.started = true;
+                    state.currentQuestionIndex = 0;
+                    state.userAnswers = [null, null, null, null, null, null, null];
+                    state.submitted = false;
+                    render();
+                }
+            });
+        }
+
+        function renderTest() {
+            const q = questions[state.currentQuestionIndex];
+            const isLastQuestion = (state.currentQuestionIndex === questions.length - 1);
+            
+            let contextHtml = '';
+            if (q.id === 4) {
+                contextHtml = `
+                    <div class="relato-principal">
+                        <p>⚽ <strong>Una pausa por respeto:</strong> Durante un partido de la Bundesliga (Alemania) en abril de 2022, el árbitro Matthias Jollenbeck tomó una decisión histórica. Al atardecer, el futbolista Moussa Niakhaté, de religión musulmana, necesitaba romper el ayuno del Ramadán. El jugador, que había permanecido sin ingerir alimentos ni agua durante todo el día, requería hidratarse y alimentarse para poder continuar en el campo.</p>
+                        <p>El árbitro, consciente de la situación, decidió detener el juego y permitir que el futbolista atendiera sus necesidades físicas y religiosas. La pausa duró apenas unos minutos, pero su significado trascendió el ámbito deportivo.</p>
+                    </div>
+                    <div class="fuente-contexto">
+                        <i>Tomado de: Infobae (2022). "Histórico: un partido de la Bundesliga se detuvo para que un futbolista musulmán pudiera romper el ayuno después del Ramadán".</i>
+                    </div>
+                `;
+            } else if (q.id === 5) {
+                contextHtml = `
+                    <p>Un estudio de la Registraduría Nacional sobre la participación electoral en Colombia entre 2014 y 2023 reveló los siguientes patrones:</p>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo de elección</th>
+                                <th>Territorios con mayor participación</th>
+                                <th>Territorios con menor participación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Presidenciales</strong></td>
+                                <td>Bogotá, Cundinamarca, Boyacá, Santander (promedio ~60%)</td>
+                                <td>San Andrés, Vaupés, La Guajira, Vichada, Guainía (<33%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Legislativas (Congreso)</strong></td>
+                                <td>Sucre, Córdoba, Guainía, Atlántico, Vaupés (>55%)</td>
+                                <td>Caquetá, Antioquia, Valle del Cauca, Putumayo, Bogotá (<40%)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Locales (alcaldes/gobernadores)</strong></td>
+                                <td>Casanare, Sucre, Córdoba (>70%)</td>
+                                <td>Valle del Cauca, Bogotá, San Andrés, Antioquia (~53%)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="fuente-contexto">
+                        <i>Tomado de: Registraduría Nacional del Estado Civil. (2024). Análisis de participación electoral en Colombia 2014-2023. Bogotá: Centro de Estudios en Democracia y Asuntos Electorales (CEDAE).</i>
+                    </div>
+                `;
+            } else if (q.id === 7) {
+                contextHtml = `
+                    <p><strong>📊 Datos clave:</strong> Entre 1991 y 2018 se impulsaron 177 revocatorias del mandato en Colombia. Solo una logró revocar al mandatario.</p>
+                    <div class="fuentes-grid">
+                        <div class="fuente-card">
+                            <div class="fuente-titulo">📋 1. Registraduría</div>
+                            <div class="fuente-contenido">Requiere votación mínima del 40% de quienes sufragaron en la elección</div>
+                        </div>
+                        <div class="fuente-card">
+                            <div class="fuente-titulo">📚 2. Análisis académico</div>
+                            <div class="fuente-contenido">Ha sido usada más por opositores que perdieron que por la ciudadanía</div>
+                        </div>
+                        <div class="fuente-card">
+                            <div class="fuente-titulo">📰 3. Artículo de opinión</div>
+                            <div class="fuente-contenido">La 'insatisfacción general' como causal fue un error conceptual</div>
+                        </div>
+                        <div class="fuente-card">
+                            <div class="fuente-titulo">📺 4. Informe periodístico</div>
+                            <div class="fuente-contenido">El trámite puede durar hasta 15 meses por requisitos de firmas</div>
+                        </div>
+                    </div>
+                `;
+            } else if (q.id === 6) {
+                contextHtml = `
+                    <div class="relato-principal">
+                        ${q.context.replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="fuente-contexto">
+                        <i>Fuente: Registraduría Nacional del Estado Civil. (2016). Plebiscito 2 de octubre de 2016: resultados definitivos. Bogotá.</i>
+                    </div>
+                `;
+            } else {
+                contextHtml = q.context.replace(/\n/g, '<br>');
+            }
+            
+            let html = `
+                <div class="question">
+                    <div class="context-box">
+                        <strong>CONTEXTO (Pregunta ${state.currentQuestionIndex+1} de ${questions.length}):</strong><br>${contextHtml}
+                    </div>
+                    <p><strong>${q.question}</strong></p>
+                    <div class="options" id="optionsContainer">
+            `;
+            
+            q.options.forEach((opt, idx) => {
+                const checked = (state.userAnswers[state.currentQuestionIndex] === idx) ? 'checked' : '';
+                html += `
+                    <label>
+                        <input type="radio" name="answer" value="${idx}" ${checked}>
+                        ${opt}
+                    </label>
+                `;
+            });
+            
+            html += `</div>`;
+
+            html += `<div class="nav-buttons">`;
+            if (state.currentQuestionIndex > 0) html += `<button class="btn-nav" id="prevBtn">← Anterior</button>`; else html += `<button class="btn-nav" disabled>← Anterior</button>`;
+            if (!isLastQuestion) html += `<button class="btn-nav" id="nextBtn">Siguiente →</button>`; else html += `<button class="btn-nav" id="nextBtn" disabled>Siguiente →</button>`;
+            html += `</div>`;
+
+            if (isLastQuestion) html += `<button class="btn-submit" id="submitBtn">Finalizar prueba</button>`;
+
+            contentDiv.innerHTML = html;
+
+            document.querySelectorAll('input[name="answer"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    state.userAnswers[state.currentQuestionIndex] = parseInt(e.target.value);
+                });
+            });
+
+            document.getElementById('prevBtn')?.addEventListener('click', () => {
+                if (state.currentQuestionIndex > 0) {
+                    state.currentQuestionIndex--;
+                    render();
+                }
+            });
+
+            document.getElementById('nextBtn')?.addEventListener('click', () => {
+                if (state.currentQuestionIndex < questions.length - 1) {
+                    if (state.userAnswers[state.currentQuestionIndex] === null) {
+                        alert('Por favor responde esta pregunta antes de continuar.');
+                        return;
+                    }
+                    state.currentQuestionIndex++;
+                    render();
+                }
+            });
+
+            document.getElementById('submitBtn')?.addEventListener('click', () => {
+                if (state.userAnswers[state.currentQuestionIndex] === null) {
+                    alert('Por favor responde esta pregunta antes de finalizar.');
+                    return;
+                }
+                if (state.userAnswers.includes(null)) {
+                    alert('Aún hay preguntas sin responder. Revisa la navegación.');
+                    return;
+                }
+                state.submitted = true;
+                render();
+            });
+        }
+
+        function renderResults() {
+            let correctCount = 0;
+            const resultsPerQuestion = questions.map((q, idx) => {
+                const isCorrect = (state.userAnswers[idx] === q.correct);
+                if (isCorrect) correctCount++;
+                return {
+                    questionId: idx + 1,
+                    userAnswer: state.userAnswers[idx],
+                    userAnswerText: q.options[state.userAnswers[idx]],
+                    isCorrect,
+                    correctAnswerText: q.options[q.correct],
+                    justification: q.justification,
+                    distractorAnalysis: (!isCorrect && q.distractors[state.userAnswers[idx]] !== "CORRECTA") ? q.distractors[state.userAnswers[idx]] : null,
+                    taxonomy: q.taxonomy
+                };
+            });
+
+            const percentage = (correctCount / questions.length) * 100;
+
+            // Análisis cualitativo global
+            let cualitativoGlobal = '';
+            let estrategiaGlobal = '';
+
+            if (percentage >= 80) {
+                cualitativoGlobal = '¡Desempeño sobresaliente! Has respondido correctamente la mayoría de las preguntas.';
+                estrategiaGlobal = 'Continúa profundizando en casos prácticos.';
+            } else if (percentage >= 60) {
+                cualitativoGlobal = 'Desempeño aceptable. Tienes bases importantes.';
+                estrategiaGlobal = 'Concéntrate en los mecanismos de participación.';
+            } else {
+                cualitativoGlobal = 'Requiere refuerzo significativo.';
+                estrategiaGlobal = 'Te sugerimos repasar los conceptos fundamentales.';
+            }
+
+            // Construir tabla de competencias
+            let competenciasHtml = `
+                <h3 style="color:#1a2b4c; margin: 25px 0 15px 0;">📊 Desempeño por Competencias y Evidencias</h3>
+                <table class="competencias-table">
+                    <thead>
+                        <tr>
+                            <th>Competencia</th>
+                            <th>Evidencia</th>
+                            <th>Desempeño</th>
+                            <th>Valoración</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            // Agrupar por competencia
+            const competencias = {};
+            resultsPerQuestion.forEach(r => {
+                if (!competencias[r.taxonomy.competence]) {
+                    competencias[r.taxonomy.competence] = {};
+                }
+                if (!competencias[r.taxonomy.competence][r.taxonomy.evidence]) {
+                    competencias[r.taxonomy.competence][r.taxonomy.evidence] = { total: 0, correctas: 0 };
+                }
+                competencias[r.taxonomy.competence][r.taxonomy.evidence].total++;
+                if (r.isCorrect) competencias[r.taxonomy.competence][r.taxonomy.evidence].correctas++;
+            });
+
+            for (const comp in competencias) {
+                for (const evid in competencias[comp]) {
+                    const data = competencias[comp][evid];
+                    const evidPercentage = (data.correctas / data.total) * 100;
+                    let badge = '<span class="badge-regular">Regular</span>';
+                    if (evidPercentage >= 80) badge = '<span class="badge-excelente">Excelente</span>';
+                    else if (evidPercentage >= 60) badge = '<span class="badge-bien">Bien</span>';
+                    else if (evidPercentage >= 40) badge = '<span class="badge-regular">Regular</span>';
+                    else badge = '<span class="badge-mejorar">Por mejorar</span>';
+
+                    competenciasHtml += `
+                        <tr>
+                            <td>${comp}</td>
+                            <td>${evid.substring(0, 60)}</td>
+                            <td>${data.correctas}/${data.total} (${evidPercentage.toFixed(0)}%)</td>
+                            <td>${badge}</td>
+                        </tr>
+                    `;
+                }
+            }
+
+            competenciasHtml += `</tbody></table>`;
+
+            let resultsHtml = `
+                <div class="results-panel">
+                    <h2 style="text-align:center;">📊 Resultados Consolidados</h2>
+                    <div style="text-align:center; margin-bottom:20px; font-size:1.2rem; background:rgba(255,255,255,0.15); padding:15px; border-radius:50px;">
+                        <strong>${state.studentName}</strong> - Curso: ${state.studentCourse}
+                    </div>
+                    <div class="results-grid">
+                        <div class="result-card">
+                            <h3>📈 Cuantitativo</h3>
+                            <div class="score-big">${correctCount}/${questions.length}</div>
+                            <p style="text-align:center; font-size:1.5rem;">${percentage.toFixed(1)}%</p>
+                        </div>
+                        <div class="result-card">
+                            <h3>🧠 Cualitativo</h3>
+                            <p>${cualitativoGlobal}</p>
+                        </div>
+                    </div>
+
+                    <div class="feedback-detalle">
+                        <h3 style="color:#1a2b4c;">🔍 Retroalimentación por pregunta</h3>
+            `;
+
+            resultsPerQuestion.forEach((r, idx) => {
+                resultsHtml += `
+                    <div class="pregunta-resumen">
+                        <h4 style="color:#1a2b4c;">Pregunta ${idx + 1}</h4>
+                        <div class="taxonomy-mini">
+                            <p><strong>Competencia:</strong> ${r.taxonomy.competence}</p>
+                            <p><strong>Evidencia:</strong> ${r.taxonomy.evidence}</p>
+                        </div>
+                        <p><strong>Tu respuesta:</strong> ${r.userAnswerText}</p>
+                        <p><strong>Respuesta correcta:</strong> ${r.correctAnswerText}</p>
+                        <div class="justificacion">
+                            <strong>Justificación:</strong><br>${r.justification.substring(0, 150)}...
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsHtml += `
+                        ${competenciasHtml}
+                        <h4 style="margin-top:30px;">📘 Estrategia de mejora</h4>
+                        <p>${estrategiaGlobal}</p>
+                    </div>
+                    <button class="btn-restart" id="restartBtn" style="background:#ffb300; color:#1a2b4c; width:100%;">Volver a intentar</button>
+                </div>
+            `;
+
+            contentDiv.innerHTML = resultsHtml;
+
+            // Guardar resultados
+            saveResults(correctCount, percentage);
+
+            document.getElementById('restartBtn')?.addEventListener('click', () => {
+                state.started = false;
+                state.currentQuestionIndex = 0;
+                state.userAnswers = [null, null, null, null, null, null, null];
+                state.submitted = false;
+                render();
+            });
+        }
+
+        // ==================================================
+        // FUNCIÓN PARA ENVIAR A GOOGLE SHEETS (CORREGIDA)
+        // ==================================================
+        function saveResults(correctCount, percentage) {
+            // Preparar los datos
+            const datos = {
+                nombre: state.studentName,
+                curso: state.studentCourse,
+                totalPreguntas: questions.length,
+                aciertos: correctCount,
+                porcentaje: percentage.toFixed(1),
+                p1: state.userAnswers[0] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[0]] : '',
+                p2: state.userAnswers[1] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[1]] : '',
+                p3: state.userAnswers[2] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[2]] : '',
+                p4: state.userAnswers[3] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[3]] : '',
+                p5: state.userAnswers[4] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[4]] : '',
+                p6: state.userAnswers[5] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[5]] : '',
+                p7: state.userAnswers[6] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[6]] : ''
+            };
+
+            console.log('📤 Enviando datos:', datos);
+
+            // URL de Google Apps Script (REEMPLAZA ESTO)
+            const url = 'URL_DE_TU_SCRIPT';
+
+            // Enviar usando JSON
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(datos)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ Respuesta:', data);
+                showNotification('✅ Resultados guardados en Google Sheets');
+            })
+            .catch(error => {
+                console.error('❌ Error:', error);
+                showNotification('⚠️ Datos guardados localmente', true);
+            });
+
+            // Guardar también en localStorage como respaldo
+            const history = JSON.parse(localStorage.getItem('saber11_history') || '[]');
+            history.push({
+                fecha: new Date().toISOString(),
+                ...datos
+            });
+            localStorage.setItem('saber11_history', JSON.stringify(history));
+        }
+
+        render();
+    })();
+</script>
+</body>
+</html>
