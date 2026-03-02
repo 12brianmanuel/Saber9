@@ -1139,56 +1139,37 @@ Todas las opciones tienen las mismas palabras pero en diferente orden. Solo la o
         // FUNCIÓN PARA ENVIAR A GOOGLE SHEETS (CORREGIDA)
         // ==================================================
         function saveResults(correctCount, percentage) {
-            // Preparar los datos
-            const datos = {
-                nombre: state.studentName,
-                curso: state.studentCourse,
-                totalPreguntas: questions.length,
-                aciertos: correctCount,
-                porcentaje: percentage.toFixed(1),
-                p1: state.userAnswers[0] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[0]] : '',
-                p2: state.userAnswers[1] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[1]] : '',
-                p3: state.userAnswers[2] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[2]] : '',
-                p4: state.userAnswers[3] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[3]] : '',
-                p5: state.userAnswers[4] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[4]] : '',
-                p6: state.userAnswers[5] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[5]] : '',
-                p7: state.userAnswers[6] !== null ? ['A', 'B', 'C', 'D'][state.userAnswers[6]] : ''
-            };
-
-            console.log('📤 Enviando datos:', datos);
-
-            // URL de Google Apps Script (REEMPLAZA ESTO)
-            const url = 'https://script.google.com/macros/s/AKfycbxAqbSOaoU53jMGNX_FPgCyyVNsPxswMdInKRNLslS3XXPia_uq5jUQ0ZdH5v0dKim6/exec';
-
-            // Enviar usando JSON
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(datos)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('✅ Respuesta:', data);
-                showNotification('✅ Resultados guardados en Google Sheets');
-            })
-            .catch(error => {
-                console.error('❌ Error:', error);
-                showNotification('⚠️ Datos guardados localmente', true);
-            });
-
-            // Guardar también en localStorage como respaldo
-            const history = JSON.parse(localStorage.getItem('saber11_history') || '[]');
-            history.push({
-                fecha: new Date().toISOString(),
-                ...datos
-            });
-            localStorage.setItem('saber11_history', JSON.stringify(history));
-        }
-
-        render();
-    })();
-</script>
-</body>
-</html>
+    const datos = {
+        nombre: state.studentName,
+        curso: state.studentCourse,
+        totalPreguntas: questions.length,
+        aciertos: correctCount,
+        porcentaje: percentage.toFixed(1),
+        p1: state.userAnswers[0] !== null ? ['A','B','C','D'][state.userAnswers[0]] : '',
+        p2: state.userAnswers[1] !== null ? ['A','B','C','D'][state.userAnswers[1]] : '',
+        p3: state.userAnswers[2] !== null ? ['A','B','C','D'][state.userAnswers[2]] : '',
+        p4: state.userAnswers[3] !== null ? ['A','B','C','D'][state.userAnswers[3]] : '',
+        p5: state.userAnswers[4] !== null ? ['A','B','C','D'][state.userAnswers[4]] : '',
+        p6: state.userAnswers[5] !== null ? ['A','B','C','D'][state.userAnswers[5]] : '',
+        p7: state.userAnswers[6] !== null ? ['A','B','C','D'][state.userAnswers[6]] : ''
+    };
+    
+    console.log('📤 Enviando:', datos);
+    
+    const url = https://script.google.com/macros/s/AKfycbzuX-SlDhEgZt9BKAxiH9jaMGqorTGRRnsrZrFHxELJFBvABGo8VEYnCLlSeFK9oiwJ/exec
+    
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('✅ Respuesta:', data);
+        alert('✅ Datos guardados correctamente');
+    })
+    .catch(error => {
+        console.error('❌ Error:', error);
+        alert('❌ Error al guardar: ' + error.message);
+    });
+}
