@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis Interactivo - Prueba Saber 11 Sociales</title>
+    
+    <!-- Librerías Externas -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Slate Gray (Background), Navy Blue (Primary), Amber (Accent), Rose (Alert/Danger), Emerald (Success) -->
+    <!-- Application Structure Plan: Dashboard interactivo de una sola página (SPA) con navegación por pestañas. Inicia con la Portada (contexto), pasa al Resumen Ejecutivo (datos/gráficos), profundiza en los Casos de Estudio (cuestionario interactivo dinámico) y finaliza con las Estrategias Pedagógicas. Estructura diseñada para guiar al docente desde el panorama general hasta la acción específica. -->
+    <!-- Visualization & Content Choices: Se utiliza Chart.js para visualizar métricas clave. El cuestionario se renderiza 100% por JS manipulando el DOM para evitar recargas. Diseño apoyado en clases de Tailwind y CSS personalizado para animaciones fluidas. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #1e293b; /* Slate 800 */
+        }
+
+        /* Configuración de Contenedor de Gráfico para Responsive Design */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container { height: 250px; }
+        }
+
+        /* Estilos de Pestañas (Tabs) */
+        .tab-btn {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            color: #1e3a8a; /* Blue 900 */
+            border-bottom: 3px solid #d97706; /* Amber 600 */
+            font-weight: 600;
+        }
+        
+        /* Control de Secciones */
+        .section-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .section-content.active { display: block; }
+
+        /* Estilos del Cuestionario Interactivo */
+        .quiz-option {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .quiz-option:hover:not(.disabled) {
+            border-color: #1e3a8a;
+            background-color: #eff6ff;
+            transform: translateX(4px);
+        }
+        .quiz-option.correct {
+            border-color: #10b981;
+            background-color: #ecfdf5;
+            color: #065f46;
+        }
+        .quiz-option.incorrect {
+            border-color: #e11d48;
+            background-color: #fff1f2;
+            color: #9f1239;
+        }
+        .quiz-option.disabled {
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Colores de Categorías (Badges) */
+        .badge-reflexivo { background-color: #ffe4e6; color: #9f1239; border: 1px solid #fda4af; } 
+        .badge-perspectivas { background-color: #fef3c7; color: #92400e; border: 1px solid #fcd34d; } 
+        .badge-social { background-color: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; } 
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col selection:bg-amber-200 selection:text-amber-900">
+
+    <!-- Encabezado Principal -->
+    <header class="bg-blue-900 text-white shadow-md z-20 sticky top-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 class="text-xl md:text-2xl font-extrabold tracking-tight truncate">Análisis Saber 11: Sociales y Ciudadanas</h1>
+            <p class="mt-1 text-blue-200 text-sm font-medium tracking-wide">TEST PILOTO 1 AVIÓN - Grupo 10°-2</p>
+        </div>
+        
+        <!-- Navegación por Pestañas -->
+        <nav class="bg-white border-b border-gray-200 shadow-sm overflow-x-auto custom-scrollbar">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-6 md:space-x-8 min-w-max" id="nav-tabs">
+                    <button class="tab-btn active text-gray-500 hover:text-blue-800 py-3 px-1 font-medium text-sm focus:outline-none" data-target="portada">
+                        &#127968; Inicio / Portada
+                    </button>
+                    <button class="tab-btn text-gray-500 hover:text-blue-800 py-3 px-1 font-medium text-sm focus:outline-none" data-target="dashboard">
+                        &#128202; Resumen Ejecutivo
+                    </button>
+                    <button class="tab-btn text-gray-500 hover:text-blue-800 py-3 px-1 font-medium text-sm focus:outline-none" data-target="interactivo">
+                        &#127919; Banco Interactivo
+                    </button>
+                    <button class="tab-btn text-gray-500 hover:text-blue-800 py-3 px-1 font-medium text-sm focus:outline-none" data-target="estrategias">
+                        &#128161; Plan de Acción
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- SECCIÓN 0: Portada -->
+        <section id="portada" class="section-content active">
+            <div class="flex flex-col items-center justify-center min-h-[70vh] text-center bg-white rounded-2xl shadow-xl p-6 sm:p-12 border-t-8 border-blue-900 relative overflow-hidden">
+                
+                <!-- Decoración de Fondo -->
+                <div class="absolute top-0 right-0 -mt-10 -mr-10 text-gray-100 opacity-40 transform rotate-12 pointer-events-none text-[15rem] select-none">
+                    &#x1F4CA;
+                </div>
+
+                <!-- Logo Institucional -->
+                <img src="https://i.ibb.co/vvsXR4Nj/Monter-a-Bilingual-School-01-1-1.png" alt="Logo Institucional" class="w-56 sm:w-80 h-auto mb-10 object-contain relative z-10 transition-transform hover:scale-105 duration-500 drop-shadow-sm">
+                
+                <!-- Títulos Principales -->
+                <div class="relative z-10">
+                    <h2 class="text-xs sm:text-sm font-bold text-amber-600 tracking-widest uppercase mb-4 bg-amber-50 inline-block px-5 py-1.5 rounded-full border border-amber-200">Informe Oficial de Resultados</h2>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-blue-900 mb-4 uppercase drop-shadow-sm leading-tight">TEST PILOTO 1 AVIÓN</h1>
+                    <h3 class="text-xl md:text-3xl font-semibold text-gray-600 mb-12">Área de Ciencias Sociales y Ciudadanas</h3>
+                </div>
+                
+                <!-- Tarjeta de Datos del Grupo -->
+                <div class="bg-gray-50 rounded-2xl p-6 sm:p-8 w-full max-w-2xl border border-gray-200 shadow-inner mb-12 relative z-10 hover:shadow-md transition-shadow">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg items-center">
+                        <div class="flex flex-col md:text-right">
+                            <span class="text-xs sm:text-sm text-gray-500 uppercase font-bold tracking-wider flex items-center justify-center md:justify-end gap-2">&#x1F465; Grupo Evaluado</span>
+                            <span class="font-black text-4xl text-gray-900 mt-2">10°-2</span>
+                        </div>
+                        <div class="hidden md:block border-l-2 border-gray-300 h-20 mx-auto"></div>
+                        <div class="flex flex-col md:text-left">
+                            <span class="text-xs sm:text-sm text-gray-500 uppercase font-bold tracking-wider flex items-center justify-center md:justify-start gap-2">&#x1F468;&#x200D;&#x1F3EB; Docente Titular</span>
+                            <span class="font-bold text-xl sm:text-2xl text-blue-900 mt-2 leading-tight">Brian Manuel Contreras Martinez</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de Llamada a la Acción -->
+                <button onclick="document.querySelector('[data-target=\'dashboard\']').click()" class="relative z-10 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold py-4 px-8 sm:px-12 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-xl flex items-center gap-3 text-lg focus:outline-none focus:ring-4 focus:ring-amber-300">
+                    <span>Ver Análisis Ejecutivo</span>
+                    <span class="text-2xl leading-none">&rarr;</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 1: Dashboard Ejecutivo -->
+        <section id="dashboard" class="section-content">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 border-b-2 border-gray-200 pb-3">Métricas de Desempeño y Taxonomía</h2>
+                <p class="mt-4 text-gray-600 text-lg max-w-4xl leading-relaxed">Este panel ofrece una vista panorámica del rendimiento del grupo 10°-2 en la prueba. El escenario actual requiere intervención prioritaria debido a la baja media general y al marcado efecto tijera (dispersión de puntajes).</p>
+            </div>
+
+            <!-- Tarjetas de KPIs (Indicadores Clave) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 border-l-4 border-amber-500 transform hover:-translate-y-1 transition-transform duration-300">
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">&#x1F4C8; Promedio General</p>
+                    <div class="flex items-baseline mb-2">
+                        <p class="text-5xl font-black text-gray-900">45</p>
+                        <p class="ml-2 text-sm font-medium text-gray-500">/ 100 pts</p>
+                    </div>
+                    <p class="text-xs text-amber-700 font-bold bg-amber-50 inline-block px-2.5 py-1 rounded-md border border-amber-200">Escenario Crítico (E4)</p>
+                    <p class="mt-3 text-xs text-gray-500">A 10.5 pts de distancia del umbral mínimo de suficiencia (Nivel 3).</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 border-l-4 border-rose-500 transform hover:-translate-y-1 transition-transform duration-300">
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">&#x26A0;&#xFE0F; Dispersión (Desv. Est.)</p>
+                    <div class="flex items-baseline mb-2">
+                        <p class="text-5xl font-black text-gray-900">14</p>
+                    </div>
+                    <p class="text-xs text-rose-700 font-bold bg-rose-50 inline-block px-2.5 py-1 rounded-md border border-rose-200">Alta Heterogeneidad</p>
+                    <p class="mt-3 text-xs text-gray-500">Efecto tijera: Coexisten puntajes de rezago (24) con sobresalientes (78).</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 border-l-4 border-blue-500 transform hover:-translate-y-1 transition-transform duration-300">
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">&#x1F4A5; Déficit Crítico Mayor</p>
+                    <div class="flex items-baseline mb-2">
+                        <p class="text-5xl font-black text-blue-900">58%</p>
+                        <p class="ml-2 text-sm font-medium text-gray-500">Falla Promedio</p>
+                    </div>
+                    <p class="text-xs text-blue-700 font-bold bg-blue-50 inline-block px-2.5 py-1 rounded-md border border-blue-200">Alerta Global</p>
+                    <p class="mt-3 text-xs text-gray-500">El mayor déficit absoluto se encuentra en Pensamiento Sistémico.</p>
+                </div>
+            </div>
+
+            <!-- Contenedor del Gráfico -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 mb-8">
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Índice de Fracaso por Competencia Evaluada</h3>
+                    <p class="text-sm text-gray-500 mt-1">Porcentaje de estudiantes que <strong>no lograron</strong> consolidar los aprendizajes estructurales exigidos por el ICFES en cada área.</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="competencyChart"></canvas>
+                </div>
+                
+                <!-- Alerta Contextual -->
+                <div class="mt-6 bg-amber-50 p-4 rounded-xl border border-amber-200 flex items-start gap-4">
+                    <div class="text-2xl mt-0.5">&#x1F4A1;</div>
+                    <div>
+                        <h4 class="font-bold text-amber-900 text-sm mb-1">Observación Estratégica</h4>
+                        <p class="text-sm text-amber-800 leading-relaxed">Las tres competencias evaluadas superan ampliamente la barrera del 50% de no logro. Esto indica una debilidad conceptual generalizada que impide a la mayoría del grupo analizar críticamente el Estado, evaluar perspectivas y conectar variables en problemas sociales complejos.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-8">
+                <button onclick="document.querySelector('[data-target=\'interactivo\']').click()" class="inline-flex items-center gap-2 text-blue-700 font-bold hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-6 py-3 rounded-full transition-colors">
+                    Profundizar en el Banco de Preguntas Interactivo <span class="text-xl leading-none">&rarr;</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: Banco Interactivo de Preguntas -->
+        <section id="interactivo" class="section-content">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-gray-900 border-b-2 border-gray-200 pb-3">Banco Interactivo: Casos de Estudio</h2>
+                <p class="mt-4 text-gray-600 text-lg max-w-4xl leading-relaxed">Explore los ítems evaluados en el simulacro. Seleccione una opción de respuesta en cada tarjeta para simular la prueba y acceder de inmediato a la retroalimentación pedagógica, identificando el origen de los errores típicos cometidos por los estudiantes.</p>
+            </div>
+
+            <!-- Contenedor Dinámico de Quizzes (Inyectado vía JS) -->
+            <div id="quiz-container" class="space-y-10">
+                <!-- El JavaScript renderiza las tarjetas aquí -->
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: Plan de Acción Pedagógica -->
+        <section id="estrategias" class="section-content">
+            <!-- Encabezado de la Sección -->
+            <div class="mb-10 bg-gradient-to-br from-blue-900 to-blue-800 rounded-2xl p-8 sm:p-10 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-3xl md:text-4xl font-extrabold mb-4 flex items-center gap-3">
+                        <span>&#x1F680;</span> Plan de Acción Pedagógica
+                    </h2>
+                    <p class="text-blue-100 text-lg md:text-xl max-w-3xl leading-relaxed">En respuesta directa a las fallas cognitivas detectadas en el grupo 10°-2, se diseñó este marco de intervención. Las estrategias priorizan mitigar el desconocimiento estructural del Estado y fomentar el pensamiento crítico aplicable.</p>
+                </div>
+                <!-- Marca de agua decorativa -->
+                <span class="absolute right-0 bottom-0 text-[12rem] opacity-5 transform translate-x-12 translate-y-16 pointer-events-none select-none">&#x1F4D6;</span>
+            </div>
+
+            <!-- Grid de Estrategias -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Estrategia 1 -->
+                <div class="bg-white border-t-4 border-blue-600 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300">
+                    <div class="flex items-center mb-5">
+                        <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-3xl mr-4 border border-blue-100 shadow-sm">&#x1F3DB;&#xFE0F;</div>
+                        <h3 class="text-xl font-extrabold text-gray-800 leading-tight">1. Cartografía del Estado (Intervención Urgente)</h3>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 mb-4 inline-block border border-gray-200">
+                        <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Atiende: Preguntas 84 y 89 (Fracaso > 60%)</p>
+                    </div>
+                    <p class="text-gray-600 mb-5 leading-relaxed">El grupo presenta una confusión basal gravísima respecto a las funciones de las entidades de control. Confunden sistemáticamente las competencias fiscales, disciplinarias y penales.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 mt-0.5">&#10004;</span>
+                            <span class="text-sm text-gray-700"><strong>Taller Clínico "¿Quién investiga qué?":</strong> Creación forzosa de cuadros comparativos separando Contraloría (Dinero), Procuraduría (Conducta) y Fiscalía (Delito).</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2 mt-0.5">&#10004;</span>
+                            <span class="text-sm text-gray-700"><strong>Simulador de Casos Reales:</strong> Exponer a los alumnos a noticias reales de desfalcos locales y obligarlos a identificar el ente competente para actuar.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Estrategia 2 -->
+                <div class="bg-white border-t-4 border-rose-600 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300">
+                    <div class="flex items-center mb-5">
+                        <div class="w-14 h-14 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center text-3xl mr-4 border border-rose-100 shadow-sm">&#x1F50D;</div>
+                        <h3 class="text-xl font-extrabold text-gray-800 leading-tight">2. Laboratorio Crítico de Fuentes</h3>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 mb-4 inline-block border border-gray-200">
+                        <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Atiende: Pregunta 76 y Evaluación Argumentativa</p>
+                    </div>
+                    <p class="text-gray-600 mb-5 leading-relaxed">Incapacidad demostrada para juzgar la confiabilidad de la información. Los estudiantes no logran aplicar el concepto académico de "independencia de la fuente".</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-rose-500 mr-2 mt-0.5">&#10004;</span>
+                            <span class="text-sm text-gray-700"><strong>Disección de Informes de ONGs:</strong> Enseñar de manera directa por qué la falta de vínculos gubernamentales hace que fuentes como Human Rights Watch sean académicamente válidas.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-rose-500 mr-2 mt-0.5">&#10004;</span>
+                            <span class="text-sm text-gray-700"><strong>Contraste Obligatorio:</strong> Presentar siempre dos textos con posturas radicalmente opuestas (ej. Extractivismo vs Conservación) y exigir síntesis conjuntas en lugar de toma de partido inicial.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Estrategia 3 -->
+                <div class="bg-white border-t-4 border-amber-500 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300">
+                    <div class="flex items-center mb-5">
+                        <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center text-3xl mr-4 border border-amber-100 shadow-sm">&#x1F5FA;&#xFE0F;</div>
+                        <h3 class="text-xl font-extrabold text-gray-800 leading-tight">3. Matrices Multidimensionales</h3>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 mb-4 inline-block border border-gray-200">
+                        <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Atiende: Pensamiento Sistémico (58% Falla Global)</p>
+                    </div>
+                    <p class="text-gray-600 mb-5 leading-relaxed">Existe una "ceguera" ante consecuencias colaterales. Los estudiantes analizan problemas sociales de manera lineal, ignorando impactos en dimensiones adyacentes.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-2 mt-0.5">&#10004;</span>
+                            <span class="text-sm text-gray-700"><strong>Matriz Cruzada Obligatoria:</strong> Ante cualquier problema coyuntural, el alumno deberá completar una tabla forzando el análisis simultáneo de las dimensiones: Política, Económica y Ambiental.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-2 mt-0.5">&#10004;</span>
+                            <span class="text-sm text-gray-700"><strong>Contexto Territorial Caribe:</strong> Usar problemáticas cercanas (ej. Navegabilidad del Río Sinú o Vendedores en el centro de Montería) para modelar la proyección de impactos no intencionados.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Estrategia 4 -->
+                <div class="bg-white border-t-4 border-emerald-500 rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300">
+                    <div class="flex items-center mb-5">
+                        <div class="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center text-3xl mr-4 border border-emerald-100 shadow-sm">&#x2696;&#xFE0F;</div>
+                        <h3 class="text-xl font-extrabold text-gray-800 leading-tight">4. Juego de Roles Inverso</h3>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3 mb-4 inline-block border border-gray-200">
+                        <p class="text-xs font-bold text-rose-600 uppercase tracking-wider">Atiende: Alta Dispersión (Desviación 14)</p>
+                    </div>
+                    <p class="text-gray-600 mb-5 leading-relaxed">Para evitar que la brecha interna del salón aumente, se requieren estrategias que reten tanto a los perfiles rezagados como a los sobresalientes a través de la empatía argumentativa.</p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-emerald-500 mr-2 mt-0.5">&#10004;</span>
+                            <span class="text-sm text-gray-700"><strong>Defensa Contraintuitiva:</strong> Asignar en debates la defensa estricta de una postura opuesta a las convicciones del estudiante para romper sesgos cognitivos.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-emerald-500 mr-2 mt-0.5">&#10004;</span>
+                            <span class="text-sm text-gray-700"><strong>Análisis Constitucional de Tutelas:</strong> Reforzar el concepto de jerarquía de derechos enseñando cómo la Corte Constitucional pondera el interés general sobre el particular.</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Pie de Página -->
+    <footer class="bg-slate-900 border-t border-slate-800 text-white mt-auto py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-slate-300 font-bold mb-2 text-lg">Reporte Generado para el Docente Titular: Brian Manuel Contreras Martinez</p>
+            <p class="text-slate-500 text-sm max-w-2xl mx-auto">Este dashboard es un instrumento analítico oficial basado estrictamente en el informe estadístico de resultados del TEST PILOTO 1 AVIÓN para el grado 10°-2 de la Institución.</p>
+        </div>
+    </footer>
+
+    <!-- Lógica de la Aplicación en JavaScript -->
+    <script>
+        // 1. Base de Datos de Preguntas (Consolidada desde el Reporte Original)
+        const questionsData = [
+            {
+                id: 67,
+                text: `En una ciudad con altos índices de contaminación se ha conseguido que todo el transporte público funcione con energías limpias o alternativas; sin embargo, los índices de contaminación no han disminuido lo suficiente como para considerar que se cuenta con un aire limpio. Por ello, se recurre a otra medida de control sobre el transporte que obliga a que los propietarios de camiones y tractomulas hagan adaptaciones a sus vehículos, a fin de que no utilicen combustibles fósiles.<br><br>De las siguientes opciones, ¿cuál corresponde a un efecto negativo de esta medida en lo que concierne al aspecto económico?`,
+                category: "Pensamiento Reflexivo y Sistémico",
+                badgeClass: "badge-reflexivo",
+                learning: "Comprender la articulación de dimensiones en problemas y soluciones (58% de fallo global en el área).",
+                skill: "Identificar consecuencias no intencionadas de una política pública en una dimensión diferente a la que busca intervenir.",
+                options: [
+                    { letter: "A", text: `La medida de control que obliga a los transportadores a hacer adaptaciones a sus vehículos les permite recibir ayudas económicas del Gobierno para realizar los ajustes.`, correct: false, feedback: `Describe un posible efecto positivo (ayudas económicas), no un impacto negativo como se solicita.` },
+                    { letter: "B", text: `La falta de análisis de fuentes de contaminación diferentes a las producidas por combustibles fósiles conduce a que la medida sea ineficaz y se mantengan los índices de contaminación.`, correct: false, feedback: `Señala un efecto negativo, pero recae en la dimensión ambiental (ineficacia de la medida ecológica). La pregunta exige localizar la consecuencia en la dimensión económica.` },
+                    { letter: "C", text: `Las adaptaciones a los vehículos generan crisis en las empresas que distribuyen combustibles fósiles y esto provoca el despido masivo de empleados.`, correct: true, feedback: `Identifica correctamente una consecuencia directa en la dimensión económica (crisis empresarial y despidos laborales) derivada de una restricción originada por motivos ambientales.` },
+                    { letter: "D", text: `Los propietarios de camiones y tractomulas aceptan adaptar sus vehículos y confían en que el cambio no disminuirá su capacidad de carga.`, correct: false, feedback: `El enunciado describe una reacción psicológica/logística positiva o neutral ("confían", "aceptan"), lo cual no responde al criterio de buscar un impacto negativo.` }
+                ]
+            },
+            {
+                id: 68,
+                text: `El fracking es un método para extraer gas y petróleo fracturando las rocas del subsuelo; aunque este método podría fortalecer la economía colombiana, parece no ser completamente seguro. Al respecto, una persona afirmó que "el fracking es una técnica cuestionada en el mundo porque afecta las aguas, el suelo y el subsuelo así como la biodiversidad y el paisaje; también puede inducir a la generación de sismos. Su posible desarrollo en el país con mayor diversidad biológica por kilómetro cuadrado del planeta y con una amplia riqueza hídrica amerita consideraciones especiales".<br><br><span class="text-sm text-gray-500 font-mono">Tomado y adaptado de: Montenegro, A. Ambientalistas se oponen a luz verde al "fracking" en el país. El Tiempo.</span><br><br>Se podría decir que la persona que hizo la anterior afirmación es un ambientalista, o sea, un individuo comprometido con el cuidado de la biodiversidad de un territorio, porque:`,
+                category: "Análisis de Perspectivas",
+                badgeClass: "badge-perspectivas",
+                learning: "Comprender perspectivas y posiciones de distintos actores sociales.",
+                skill: "Inferir la afiliación ideológica de un actor social a partir del enfoque explícito de su discurso.",
+                options: [
+                    { letter: "A", text: `estudia los posibles sismos que puede causar el fracking en un país con alto nivel de biodiversidad.`, correct: false, feedback: `Aunque menciona los sismos, ese es un dato técnico colateral, no el núcleo discursivo que define la identidad ontológica de un ambientalista.` },
+                    { letter: "B", text: `advierte sobre el impacto que puede tener este método en la fauna y flora del país con mayor diversidad biológica.`, correct: true, feedback: `Acertado. Un activista ambiental fundamenta su discurso en la salvaguarda de la naturaleza. La opción sintetiza la advertencia principal del autor referida a la protección de "aguas, suelo... biodiversidad y paisaje".` },
+                    { letter: "C", text: `cree que es más importante la crisis económica del país que el cuidado y la conservación de la biodiversidad.`, correct: false, feedback: `Terrible error de comprensión lectora. El texto afirma exactamente lo contrario: el autor exige anteponer consideraciones ecológicas por encima de las promesas de fortalecimiento económico.` },
+                    { letter: "D", text: `está a favor de la precaución, debido a que no es posible saber si un método tan inseguro podrá generar un beneficio económico real.`, correct: false, feedback: `La preocupación del autor radica en el daño inminente a la diversidad biológica, no en poner en duda la viabilidad o el monto de las ganancias económicas corporativas.` }
+                ]
+            },
+            {
+                id: 69,
+                text: `Las modelos para tallas de ropa grande han ganado popularidad, mostrando que es posible cambiar la forma en la que se concibe la belleza en el mundo de la moda. Frente a esto, una exmodelo afirmó que "no deberían permitirse mujeres con sobrepeso en el modelaje, porque en la industria de la moda es importante cuidar el aspecto físico; además, no se debería normalizar la obesidad, ya que es un problema de salud pública".<br><br>¿Qué impacto negativo podría tener la afirmación de la exmodelo en las modelos para tallas de ropa grande?`,
+                category: "Pensamiento Reflexivo y Sistémico",
+                badgeClass: "badge-reflexivo",
+                learning: "Evaluar los usos sociales de las posturas en ciencias sociales.",
+                skill: "Proyectar las ramificaciones sociales perjudiciales de un discurso público excluyente o discriminatorio.",
+                options: [
+                    { letter: "A", text: `Se podrían reducir los trabajos para las personas con sobrepeso, con la excusa de evitar el fomento.`, correct: false, feedback: `Esta es una consecuencia secundaria factible, pero el impacto primario subyacente que origina el problema laboral es el rechazo social normativizado (Opción B).` },
+                    { letter: "B", text: `Se podrían generar conductas de rechazo hacia las modelos que no se ajustan a un estereotipo de belleza.`, correct: true, feedback: `El impacto sociológico más corrosivo de discursos estigmatizantes por parte de figuras de autoridad en su gremio es la legitimación y el fomento del rechazo social, reforzando estereotipos excluyentes.` },
+                    { letter: "C", text: `Se podrían fomentar conductas saludables de alimentación que reduzcan los índices de obesidad.`, correct: false, feedback: `El estudiante que marca esto ignora la premisa de la pregunta: se pide identificar un "impacto negativo". Esta opción describe un hipotético escenario positivo en materia de salud pública.` },
+                    { letter: "D", text: `Se podrían aplicar políticas públicas que controlen la salud física de las modelos con sobrepeso.`, correct: false, feedback: `Es un salto argumentativo desproporcionado. Las declaraciones aisladas de figuras del entretenimiento rara vez se traducen directamente en marcos legislativos de control biopolítico estricto.` }
+                ]
+            },
+            {
+                id: 72,
+                text: `La situación actual de la población rural en el país, entre la que se encuentran <strong>indígenas, campesinos y afrodescendientes</strong>, es compleja, toda vez que sufren las consecuencias del conflicto armado y la desigualdad social...<br><br>Varios líderes políticos están de acuerdo con que el conflicto ha puesto de manifiesto la necesidad de fortalecer el reconocimiento de las <strong>diferentes comunidades étnicas</strong> como sujetos de especial protección... De acuerdo con lo anterior, ¿qué aspecto de la problemática no están teniendo en cuenta los líderes políticos?`,
+                category: "Pensamiento Reflexivo y Sistémico",
+                badgeClass: "badge-reflexivo",
+                learning: "Evaluar la integralidad de propuestas de solución política (Pregunta Crítica: Solo 19.5% de acierto).",
+                skill: "Identificar un vacío poblacional severo en el diseño de una política pública focalizada.",
+                options: [
+                    { letter: "A", text: `No consideran que la población rural en Colombia es de un origen étnico diverso.`, correct: false, feedback: `Falso. El enunciado precisa claramente que los líderes políticos SÍ buscan fortalecer el reconocimiento de las comunidades étnicas.` },
+                    { letter: "B", text: `No consideran a los campesinos como un grupo poblacional sujeto de especial protección.`, correct: true, feedback: `Excelente nivel de lectura crítica. El texto matriz define a la población rural como un trinomio: "indígenas, afrodescendientes Y CAMPESINOS". Al proponer los políticos ayudar SOLO a las "comunidades étnicas", dejan al campesinado tradicional excluido y en un punto ciego.` },
+                    { letter: "C", text: `No consideran que el conflicto armado ha sido uno de los factores que generan desigualdad social.`, correct: false, feedback: `Contradice la lectura literal del texto, que afirma expresamente: "están de acuerdo con que el conflicto ha puesto de manifiesto la necesidad..."` },
+                    { letter: "D", text: `No consideran la importancia de brindar a las diferentes comunidades étnicas mayor acceso a la justicia.`, correct: false, feedback: `El acceso a la justicia no es el eje central de exclusión comparativa que se plantea en la estructura del párrafo. El error letal está en la exclusión de un actor social.` }
+                ]
+            },
+            {
+                id: 76,
+                text: `La organización no gubernamental <strong>Human Rights Watch</strong> se dedica a la investigación de Derechos Humanos. Recientemente, esta organización publicó un informe donde expone que funcionarios fronterizos estadounidenses separaron, al menos, a 200 niños y niñas de sus padres. A menudo, los agentes no podían justificar la separación, tal como se determinó también a través de un estudio del <strong>New York Times</strong>.<br><br>De acuerdo con el texto anterior, ¿la información que proporciona Human Rights Watch es confiable?`,
+                category: "Análisis de Perspectivas",
+                badgeClass: "badge-perspectivas",
+                learning: "Contextualizar y evaluar metodológicamente el uso de fuentes (Alto fracaso: 70.7%).",
+                skill: "Aplicar estrictamente el criterio académico de 'independencia' para valorar la solidez de una denuncia institucional.",
+                options: [
+                    { letter: "A", text: `Sí, porque Human Rights Watch es una organización ajena al Gobierno de Estados Unidos.`, correct: true, feedback: `En ciencias sociales, el principal garante de credibilidad al investigar un Estado es la absoluta independencia de la fuente investigadora frente a dicho Estado. Esta autonomía anula el incentivo de encubrimiento institucional.` },
+                    { letter: "B", text: `No, porque Human Rights Watch no aporta información que pueda verificarse independientemente.`, correct: false, feedback: `El enunciado destruye esta afirmación al detallar que el diario "New York Times" condujo un estudio paralelo que validó los hallazgos (triangulación o verificación cruzada).` },
+                    { letter: "C", text: `Sí, porque la información que proporcionan los Gobiernos sobre sus acciones carecen de credibilidad.`, correct: false, feedback: `Es una falacia de generalización apresurada. Asumir por defecto y como regla inmutable que todos los gobiernos siempre mienten no es un criterio científico válido para avalar a un tercero.` },
+                    { letter: "D", text: `No, porque los Gobiernos tienen la obligación de cumplir con convenios internacionales que protegen la unidad familiar.`, correct: false, feedback: `El hecho de que exista una obligación legal internacional (deber ser) no invalida que metodológicamente el informe denunciando el incumplimiento sea confiable o veraz.` }
+                ]
+            },
+            {
+                id: 80,
+                text: `La presidenta del país anuncia que eliminará por decreto todos los impuestos a la importación de carros y a la maquinaria pesada para la minería y construcción. Su argumento es que esto generará progreso: se abrirán caminos, se fomentará la industria y se garantizará el desarrollo económico, el empleo masivo y el bienestar de los ciudadanos al poder comprar autos baratos.<br><br>De acuerdo con la Constitución Política de Colombia, ¿la presidenta está violando algún derecho colectivo con esta decisión unilateral?`,
+                category: "Pensamiento Social",
+                badgeClass: "badge-social",
+                learning: "Comprender la jerarquía constitucional de derechos frente al modelo económico (52% de fallo).",
+                skill: "Detectar la vulneración inconstitucional de Derechos Colectivos (Tercera Generación) ante políticas de maximización extractivista.",
+                options: [
+                    { letter: "A", text: `Sí, el derecho a la igualdad en el acceso a las oportunidades, al privilegiar sectores como la industria y la minería.`, correct: false, feedback: `Aunque existan asimetrías de mercado, la falla tutelar más grave y evidente en este escenario de fomento descontrolado de maquinaria pesada no es comercial, sino ecológica.` },
+                    { letter: "B", text: `No, pues el aumento de empleos generará bienestar material innegable para la ciudadanía.`, correct: false, feedback: `Este fue el error de muchos estudiantes: asumir que las promesas de beneficio económico (empleo) avalan pasar por encima del marco constitucional que protege los bienes inalienables de la nación.` },
+                    { letter: "C", text: `No, pues el aumento de carros generará bienestar y comodidad innegable para las familias.`, correct: false, feedback: `Idéntico al error anterior. El bienestar o confort material individual no puede suplantar la preservación de derechos colectivos irrenunciables.` },
+                    { letter: "D", text: `Sí, el derecho a un medio ambiente sano, al no tener en cuenta el impacto ambiental masivo de la maquinaria y los carros.`, correct: true, feedback: `La Constitución de 1991 (Art. 79) consagra el Medio Ambiente Sano como Derecho Colectivo superior. Aprobar una inundación de minería y parque automotor enfocándose únicamente en el lucro económico sin mitigación viola flagrantemente la carta magna.` }
+                ]
+            },
+            {
+                id: 84,
+                text: `Un puente majestuoso inaugurado el año pasado acaba de colapsar. Se abrieron investigaciones de múltiple espectro para determinar la responsabilidad penal de la constructora privada, así como la responsabilidad disciplinaria y fiscal de los servidores públicos involucrados en la contratación y supervisión.<br><br>¿A qué entidad del Estado colombiano le corresponde por mandato constitucional investigar si hubo responsabilidad fiscal con el uso de los recursos del puente?`,
+                category: "Pensamiento Social",
+                badgeClass: "badge-social",
+                learning: "Dominar la arquitectura institucional del Estado Colombiano (Déficit estructural masivo: 90.2% de la clase falló).",
+                skill: "Diferenciar de manera absoluta las competencias de los Órganos de Control: Contraloría vs Procuraduría vs Fiscalía.",
+                options: [
+                    { letter: "A", text: `A la Procuraduría General de la Nación.`, correct: false, feedback: `Error Crítico Frecuente. La Procuraduría funge como Ministerio Público; su labor es vigilar la conducta funcionarial (Control Disciplinario). No está facultada para auditar balanzas presupuestales ni recuperar dinero.` },
+                    { letter: "B", text: `A la Contaduría General de la Nación.`, correct: false, feedback: `La Contaduría es una entidad meramente administrativa encargada de llevar los libros contables macroeconómicos del Estado. Carece de funciones sancionatorias o punitivas frente a los corruptos.` },
+                    { letter: "C", text: `A la Contraloría General de la República.`, correct: true, feedback: `Perfecto. La Contraloría General es, por disposición constitucional (Art. 267), el máximo órgano de Control Fiscal del Estado. Su función única e indelegable es auditar, rastrear y recuperar cada peso del erario público mal invertido o sustraído.` },
+                    { letter: "D", text: `A la Fiscalía General de la Nación.`, correct: false, feedback: `La Fiscalía pertenece a la Rama Judicial y ejerce el Control Penal (investiga delitos para enviar culpables a prisión). La pregunta indaga exclusivamente por la rama responsable del dinero ("responsabilidad fiscal").` }
+                ]
+            },
+            {
+                id: 90,
+                text: `El Gobierno nacional suscribió un mega-contrato de intervención de un canal de agua artificial para promover la navegabilidad y transportar carbón, disminuyendo tiempos logísticos. La administración recaerá en manos privadas que gestionarán las reglas del transporte minero. El contrato especifica un costo de 3 billones de pesos y señala textualmente: <strong>"se espera que los temas ambientales con relación al canal sean tenidos en cuenta después de finalizada la obra"</strong>.<br><br>En esta situación, ¿qué aspecto vital NO tuvo en cuenta la planeación del Gobierno nacional al celebrar el contrato?`,
+                category: "Pensamiento Reflexivo y Sistémico",
+                badgeClass: "badge-reflexivo",
+                learning: "Articular de manera sistémica las variables colindantes en megaproyectos de impacto nacional.",
+                skill: "Identificar la negligencia gubernamental grave frente a dimensiones críticas adyacentes (Punto Ciego de Planeación).",
+                options: [
+                    { letter: "A", text: `La operación del canal después de que se haya realizado la magna intervención.`, correct: false, feedback: `El proyecto sí planeó esto meticulosamente, delegando contractualmente la operación al concesionario privado.` },
+                    { letter: "B", text: `La cuantiosa inversión económica que se tiene que realizar para viabilizar el canal.`, correct: false, feedback: `La inversión está perfectamente dimensionada en el pliego: tres billones de pesos colombianos.` },
+                    { letter: "C", text: `La variedad de productos a transportar luego de que el canal sea finalmente intervenido.`, correct: false, feedback: `El texto base es explícito en perfilar que la carga primaria del modelo de negocio concesionado será el carbón y otros minerales locales.` },
+                    { letter: "D", text: `La afectación letal producida a la biodiversidad de la zona de intervención hídrica.`, correct: true, feedback: `Dejar la evaluación, mitigación o planes de contingencia ambiental para "después de finalizada la obra" (que involucra dragados y tráfico de carbón) constituye una omisión técnica atroz que evidencia una visión anti-sistémica y negligente por parte del Estado.` }
+                ]
+            }
+        ];
+
+        let chartInstance = null; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            initQuizEngine();
+        });
+
+        // Controlador de Navegación de Pestañas
+        function initNavigation() {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const contents = document.querySelectorAll('.section-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Desactivar todos los elementos
+                    tabs.forEach(t => {
+                        t.classList.remove('active', 'text-blue-800');
+                        t.classList.add('text-gray-500');
+                    });
+                    contents.forEach(c => c.classList.remove('active'));
+
+                    // Activar el elemento clickeado
+                    tab.classList.add('active', 'text-blue-800');
+                    tab.classList.remove('text-gray-500');
+                    
+                    const targetId = tab.getAttribute('data-target');
+                    document.getElementById(targetId).classList.add('active');
+
+                    // Inicializar el gráfico SÓLO si se entra a la vista de Dashboard
+                    if (targetId === 'dashboard') {
+                        initCharts();
+                    }
+                });
+            });
+        }
+
+        // Motor de Renderizado de Gráficos con Chart.js
+        function initCharts() {
+            const canvasEl = document.getElementById('competencyChart');
+            if (!canvasEl) return;
+            
+            const ctx = canvasEl.getContext('2d');
+            
+            // Si el gráfico ya existe (por navegación repetida), se destruye para prevenir error de Canvas en uso.
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            
+            // Datos oficiales del archivo Informe_Resultados_10°-2.pdf proporcionado
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        ['P. Reflexivo y', 'Sistémico'], 
+                        ['Análisis de', 'Perspectivas'], 
+                        ['Pensamiento', 'Social']
+                    ],
+                    datasets: [{
+                        label: '% Estudiantes en Déficit Estructural',
+                        data: [58, 55, 54],
+                        backgroundColor: [
+                            'rgba(245, 158, 11, 0.85)', // Ámbar/Naranja (Alerta)
+                            'rgba(245, 158, 11, 0.85)', 
+                            'rgba(245, 158, 11, 0.85)'
+                        ],
+                        borderColor: [
+                            'rgb(217, 119, 6)', 
+                            'rgb(217, 119, 6)', 
+                            'rgb(217, 119, 6)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 6,
+                        hoverBackgroundColor: 'rgba(217, 119, 6, 0.95)'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { size: 14, family: 'Inter' },
+                            bodyFont: { size: 14, family: 'Inter' },
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    return ' ' + context.parsed.x + '% de la clase reprobó esta área.';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            beginAtZero: true, 
+                            max: 100, 
+                            title: { display: true, text: 'Porcentaje Acumulado de No Logro (%)', font: { weight: 'bold', size: 14, family: 'Inter' }, color: '#475569' },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y: { 
+                            ticks: { font: { size: 14, weight: '600', family: 'Inter' }, color: '#1e293b' },
+                            grid: { display: false }
+                        }
+                    },
+                    animation: { duration: 1200, easing: 'easeOutQuart' }
+                }
+            });
+        }
+
+        // Motor Dinámico del Simulador de Pruebas
+        function initQuizEngine() {
+            const container = document.getElementById('quiz-container');
+            if (!container) return;
+            
+            questionsData.forEach(q => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300';
+                
+                let optionsHtml = '';
+                q.options.forEach((opt) => {
+                    // Escapado seguro de HTML para atributos de datos
+                    const safeFeedback = opt.feedback.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+                    
+                    optionsHtml += `
+                        <div class="quiz-option border border-gray-300 rounded-xl p-4 sm:p-5 flex gap-4 text-gray-700 hover:bg-slate-50 relative group" 
+                             data-correct="${opt.correct}" 
+                             data-feedback="${safeFeedback}">
+                            <div class="shrink-0 pt-0.5">
+                                <span class="font-extrabold text-blue-900 bg-blue-50 px-3 py-1.5 rounded-lg text-center shadow-sm group-hover:bg-blue-100 transition-colors">${opt.letter}</span>
+                            </div>
+                            <span class="leading-relaxed font-medium pt-1">${opt.text}</span>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <!-- Encabezado de la Pregunta -->
+                    <div class="bg-slate-50 border-b border-gray-200 p-6 sm:p-8">
+                        <div class="flex flex-wrap items-center justify-between mb-5 gap-3">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-blue-900 text-white font-black px-4 py-1.5 rounded-lg shadow-sm text-sm tracking-wide">Pregunta ${q.id}</span>
+                                <span class="${q.badgeClass} text-xs font-bold px-3 py-1.5 rounded-md uppercase tracking-wider shadow-sm">${q.category}</span>
+                            </div>
+                        </div>
+                        <div class="text-gray-900 text-lg md:text-xl leading-relaxed font-medium space-y-4">
+                            ${q.text}
+                        </div>
+                        
+                        <!-- Metadatos Pedagógicos -->
+                        <div class="mt-6 text-sm text-gray-700 bg-white p-5 border border-gray-200 rounded-xl shadow-sm">
+                            <div class="mb-3 flex items-start gap-2">
+                                <span class="text-blue-600 text-lg leading-none">&#128161;</span> 
+                                <div><strong class="text-blue-900 block mb-0.5">Foco de Aprendizaje ICEFES:</strong> ${q.learning}</div>
+                            </div>
+                            <div class="flex items-start gap-2 pt-3 border-t border-gray-100">
+                                <span class="text-amber-600 text-lg leading-none">&#127919;</span> 
+                                <div><strong class="text-amber-900 block mb-0.5">Habilidad Cognitiva Evaluada:</strong> ${q.skill}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Zona de Opciones Interactiva -->
+                    <div class="p-6 sm:p-8">
+                        <div class="grid gap-4 options-container">
+                            ${optionsHtml}
+                        </div>
+                        <!-- Contenedor Oculto para Retroalimentación -->
+                        <div class="quiz-feedback hidden mt-6 p-6 rounded-xl border-2 text-md transition-all duration-300"></div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+                // Lógica de Eventos para Interactividad del Quiz
+                const optionElements = card.querySelectorAll('.quiz-option');
+                const feedbackEl = card.querySelector('.quiz-feedback');
+                let isAnswered = false;
+
+                optionElements.forEach(option => {
+                    option.addEventListener('click', function() {
+                        if (isAnswered) return; // Bloquear selecciones múltiples
+                        isAnswered = true;
+
+                        const isCorrect = this.getAttribute('data-correct') === 'true';
+                        const feedbackText = this.getAttribute('data-feedback');
+
+                        // 1. Evaluar visualmente TODAS las opciones
+                        optionElements.forEach(opt => {
+                            opt.classList.add('disabled');
+                            opt.classList.remove('hover:bg-slate-50', 'border-gray-300');
+                            
+                            // Resaltar la respuesta correcta sin importar lo que el usuario eligió
+                            if (opt.getAttribute('data-correct') === 'true') {
+                                opt.classList.remove('disabled'); // Mantener visiblemente fuerte la correcta
+                                opt.classList.add('border-emerald-500', 'bg-emerald-50');
+                                const letterSpan = opt.querySelector('span:first-child');
+                                letterSpan.classList.replace('bg-blue-50', 'bg-emerald-200');
+                                letterSpan.classList.replace('text-blue-900', 'text-emerald-900');
+                                letterSpan.classList.remove('group-hover:bg-blue-100');
+                            }
+                        });
+
+                        // 2. Si el usuario se equivocó, resaltar su elección en rojo
+                        if (!isCorrect) {
+                            this.classList.remove('disabled'); // Mantener visiblemente fuerte el error
+                            this.classList.add('border-rose-500', 'bg-rose-50', 'shadow-sm');
+                            const letterSpan = this.querySelector('span:first-child');
+                            letterSpan.classList.replace('bg-blue-50', 'bg-rose-200');
+                            letterSpan.classList.replace('text-blue-900', 'text-rose-900');
+                            letterSpan.classList.remove('group-hover:bg-blue-100');
+                        } else {
+                            this.classList.add('shadow-md');
+                        }
+
+                        // 3. Mostrar la Caja de Retroalimentación Pedagógica
+                        feedbackEl.classList.remove('hidden');
+                        feedbackEl.style.animation = 'fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+
+                        if (isCorrect) {
+                            feedbackEl.innerHTML = `
+                                <h4 class="font-extrabold mb-3 text-emerald-800 flex items-center gap-3 text-lg">
+                                    <span class="text-2xl bg-emerald-100 rounded-full w-8 h-8 flex items-center justify-center pb-0.5">&#10004;</span> 
+                                    Lógica Acertada:
+                                </h4>
+                                <p class="text-emerald-900 leading-relaxed">${feedbackText}</p>
+                            `;
+                            feedbackEl.className = 'quiz-feedback mt-6 p-6 rounded-xl border-2 bg-emerald-50 border-emerald-400 shadow-inner';
+                        } else {
+                            feedbackEl.innerHTML = `
+                                <h4 class="font-extrabold mb-3 text-rose-800 flex items-center gap-3 text-lg">
+                                    <span class="text-xl bg-rose-200 text-rose-800 rounded-full w-8 h-8 flex items-center justify-center font-bold">X</span> 
+                                    Fallo Conceptual:
+                                </h4>
+                                <p class="text-rose-900 leading-relaxed">${feedbackText}</p>
+                            `;
+                            feedbackEl.className = 'quiz-feedback mt-6 p-6 rounded-xl border-2 bg-rose-50 border-rose-300 shadow-inner';
+                        }
+                    });
+                });
+            });
+        }
+    </script>
+</body>
+</html>
